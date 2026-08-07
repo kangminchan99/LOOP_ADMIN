@@ -1,0 +1,24 @@
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  ok: true;
+};
+
+export async function login(request: LoginRequest): Promise<LoginResponse> {
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    throw new Error('로그인에 실패했습니다.');
+  }
+
+  return response.json() as Promise<LoginResponse>;
+}

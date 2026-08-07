@@ -1,3 +1,4 @@
+import { getAdminDashboard } from '@/src/features/dashboard/api/get-admin-dashboard';
 import { adminHomeStats } from '@/src/features/dashboard/data/admin-home-stats';
 
 /**
@@ -8,10 +9,39 @@ import { adminHomeStats } from '@/src/features/dashboard/data/admin-home-stats';
  * - useState/useEffect 같은 클라이언트 상태가 필요 없는 화면에 적합합니다.
  * - 관리자 홈처럼 "처음 진입 시 통계와 링크를 보여주는 화면"은 Server Component로 두는 게 성능상 좋습니다.
  *
- * 지금 단계에서는 실제 API를 붙이기 전이므로 mock 데이터를 사용합니다.
- * 다음 단계에서 NestJS의 /admin/dashboard API가 생기면 이 데이터를 fetch로 교체합니다.
  */
-export default function AdminHomePage() {
+export const dynamic = 'force-dynamic';
+
+export default async function AdminHomePage() {
+  const dashboard = await getAdminDashboard();
+  const stats = dashboard.data
+    ? [
+        {
+          label: '전체 유저',
+          value: dashboard.data.totalUsers.toLocaleString('ko-KR'),
+          change: `+${dashboard.data.todayUsers.toLocaleString('ko-KR')} 오늘`,
+          description: '가입 완료된 전체 사용자 수',
+        },
+        {
+          label: '전체 게시글',
+          value: dashboard.data.totalPosts.toLocaleString('ko-KR'),
+          change: `+${dashboard.data.todayPosts.toLocaleString('ko-KR')} 오늘`,
+          description: '삭제되지 않은 전체 게시글 수',
+        },
+        {
+          label: '전체 댓글',
+          value: dashboard.data.totalComments.toLocaleString('ko-KR'),
+          change: `+${dashboard.data.todayComments.toLocaleString('ko-KR')} 오늘`,
+          description: '사용자가 작성한 전체 댓글 수',
+        },
+        {
+          label: '읽지 않은 알림',
+          value: dashboard.data.unreadNotifications.toLocaleString('ko-KR'),
+          change: `${dashboard.data.totalNotifications.toLocaleString('ko-KR')} 전체`,
+          description: '사용자에게 남아있는 미확인 알림 수',
+        },
+      ]
+    : adminHomeStats;
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:px-8">
@@ -35,9 +65,17 @@ export default function AdminHomePage() {
             </div>
           </div>
         </header>
-
+        {dashboard.error ? (
+          <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+            <p className="font-semibold">서버 API 연결 확인 필요</p>
+            <p className="mt-1 text-amber-100/80">
+              {dashboard.error} · 관리자 로그인/토큰 연결 전에는 임시 데이터가
+              표시됩니다.
+            </p>
+          </div>
+        ) : null}
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {adminHomeStats.map((stat) => (
+          {stats.map((stat) => (
             <article
               key={stat.label}
               className="rounded-2xl border border-white/10 bg-white/4 p-5 shadow-2xl shadow-black/20"
