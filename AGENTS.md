@@ -22,6 +22,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 4. 작업에 필요한 문서만 추가로 읽습니다.
    - 테스트나 검증 변경: `docs/TESTING.md`
    - 데이터, 권한, 인증, 외부 연동: `docs/SECURITY.md`
+   - 관리자 UI, 레이아웃, 반응형 변경: `docs/RESPONSIVE_LAYOUT.md`
    - 기존 기술 결정과 충돌할 가능성: `docs/decisions/`
 5. 변경 대상 코드와 가장 가까운 기존 구현 및 테스트를 조사합니다.
 

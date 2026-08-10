@@ -72,6 +72,7 @@ LOOP_API_BASE_URL=http://localhost:3000
 | `AGENTS.md` | 작업 규칙과 검증 절차 |
 | `docs/TESTING.md` | 테스트와 검증 방법 |
 | `docs/SECURITY.md` | 보안과 권한 경계 |
+| `docs/RESPONSIVE_LAYOUT.md` | 반응형 레이아웃 적용 기준 |
 | `docs/decisions/` | 중요한 기술 결정 기록 |
 
 ## 검증
