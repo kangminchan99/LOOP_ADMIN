@@ -1,37 +1,48 @@
-// 관리자 웹 내부 로그인 API
 import { env } from '@/src/config/env';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-type LoginRequest = {
-  email: string;
-  password: string;
-};
-
-type LoginResponse = {
+type RefreshResponse = {
   accessToken: string;
   refreshToken: string;
 };
 
-export async function POST(request: Request) {
-  const body = (await request.json()) as LoginRequest;
+export async function POST() {
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  const response = await fetch(`${env.apiBaseUrl}/auth/login`, {
+  if (!refreshToken) {
+    return NextResponse.json(
+      { message: 'Refresh token이 없습니다.' },
+      { status: 401 },
+    );
+  }
+
+  const response = await fetch(`${env.apiBaseUrl}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      refreshToken,
+    }),
     cache: 'no-store',
   });
 
   if (!response.ok) {
-    return NextResponse.json(
-      { message: '로그인에 실패했습니다.' },
+    const nextResponse = NextResponse.json(
+      { message: '로그인 연장에 실패했습니다.' },
       { status: response.status },
     );
+
+    nextResponse.cookies.delete('accessToken');
+    nextResponse.cookies.delete('refreshToken');
+    nextResponse.cookies.delete('accessTokenExpiresAt');
+
+    return nextResponse;
   }
 
-  const tokens = (await response.json()) as LoginResponse;
+  const tokens = (await response.json()) as RefreshResponse;
 
   const accessTokenMaxAge = 60 * 15;
   const accessTokenExpiresAt = new Date(
@@ -40,6 +51,7 @@ export async function POST(request: Request) {
 
   const nextResponse = NextResponse.json({
     ok: true,
+    accessTokenExpiresAt,
   });
 
   nextResponse.cookies.set('accessToken', tokens.accessToken, {
