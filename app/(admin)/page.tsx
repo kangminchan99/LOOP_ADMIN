@@ -43,7 +43,7 @@ export default async function AdminHomePage() {
       ]
     : adminHomeStats;
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
+    <main>
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:px-8">
         <header className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-violet-300">Loop Admin</p>

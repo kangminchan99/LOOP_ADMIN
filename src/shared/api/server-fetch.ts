@@ -1,4 +1,5 @@
 import { env } from '@/src/config/env';
+import { cookies } from 'next/headers';
 
 export class ApiError extends Error {
   constructor(
@@ -16,6 +17,10 @@ export async function serverFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  const cookieStore = await cookies();
+  // 관리자 화면 API 호출 시, 서버에서 쿠키를 읽어 accessToken을 가져와서 요청 헤더에 포함시킴
+  const accessToken = cookieStore.get('accessToken')?.value;
+
   const response = await fetch(`${env.apiBaseUrl}${path}`, {
     ...options,
 
@@ -25,6 +30,7 @@ export async function serverFetch<T>(
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options.headers,
     },
   });
