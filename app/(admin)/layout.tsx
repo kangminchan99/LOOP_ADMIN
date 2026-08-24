@@ -10,6 +10,8 @@ export default async function AdminLayout({
 }) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value;
+  const accessTokenExpiresAt =
+    cookieStore.get('accessTokenExpiresAt')?.value ?? null;
 
   if (!accessToken) {
     redirect('/login');
@@ -51,7 +53,10 @@ export default async function AdminLayout({
             <p className="text-sm text-slate-400">관리자 콘솔</p>
 
             <div className="flex items-center gap-3">
-              <SessionTimer />
+              <SessionTimer
+                key={accessTokenExpiresAt ?? 'no-session'}
+                initialAccessTokenExpiresAt={accessTokenExpiresAt}
+              />
 
               <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
                 ADMIN

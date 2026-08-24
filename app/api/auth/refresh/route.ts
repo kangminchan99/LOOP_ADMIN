@@ -45,9 +45,7 @@ export async function POST() {
   const tokens = (await response.json()) as RefreshResponse;
 
   const accessTokenMaxAge = 60 * 15;
-  const accessTokenExpiresAt = new Date(
-    Date.now() + accessTokenMaxAge * 1000,
-  ).toISOString();
+  const accessTokenExpiresAt = String(Date.now() + accessTokenMaxAge * 1000);
 
   const nextResponse = NextResponse.json({
     ok: true,

@@ -3,16 +3,24 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-function getCookieValue(name: string): string | null {
-  const cookies = document.cookie.split('; ');
-
-  const targetCookie = cookies.find((cookie) => cookie.startsWith(`${name}=`));
-
-  if (!targetCookie) {
+function parseExpiresAt(expiresAtValue: string | null): number | null {
+  if (!expiresAtValue) {
     return null;
   }
 
-  return decodeURIComponent(targetCookie.split('=')[1] ?? '');
+  const expiresAtTime = Number(expiresAtValue.trim());
+
+  if (Number.isFinite(expiresAtTime)) {
+    return expiresAtTime;
+  }
+
+  const parsedDateTime = Date.parse(expiresAtValue);
+
+  if (!Number.isFinite(parsedDateTime)) {
+    return null;
+  }
+
+  return parsedDateTime;
 }
 
 function formatRemainingTime(milliseconds: number): string {
@@ -23,35 +31,49 @@ function formatRemainingTime(milliseconds: number): string {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
-export function SessionTimer() {
+type SessionTimerProps = {
+  initialAccessTokenExpiresAt?: string | null;
+};
+
+export function SessionTimer({
+  initialAccessTokenExpiresAt,
+}: SessionTimerProps) {
   const router = useRouter();
 
-  const [remainingMilliseconds, setRemainingMilliseconds] = useState(0);
+  const [expiresAtTime, setExpiresAtTime] = useState(() =>
+    parseExpiresAt(initialAccessTokenExpiresAt ?? null),
+  );
+  const [now, setNow] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const isExpired =
+    now !== null && expiresAtTime !== null && now >= expiresAtTime;
+
+  const remainingMilliseconds =
+    now === null ? 0 : Math.max(0, (expiresAtTime ?? 0) - now);
 
   useEffect(() => {
-    function updateRemainingTime() {
-      const expiresAtValue = getCookieValue('accessTokenExpiresAt');
+    const timeoutId = window.setTimeout(() => {
+      setNow(Date.now());
+    }, 0);
 
-      if (!expiresAtValue) {
-        setRemainingMilliseconds(0);
-        return;
-      }
-
-      const expiresAtTime = new Date(expiresAtValue).getTime();
-      const diff = expiresAtTime - Date.now();
-
-      setRemainingMilliseconds(Math.max(0, diff));
-    }
-
-    updateRemainingTime();
-
-    const intervalId = window.setInterval(updateRemainingTime, 1000);
+    const intervalId = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
 
     return () => {
+      window.clearTimeout(timeoutId);
       window.clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isExpired) {
+      return;
+    }
+
+    router.push('/login');
+    router.refresh();
+  }, [isExpired, router]);
 
   async function handleRefreshSession() {
     setIsRefreshing(true);
@@ -65,6 +87,12 @@ export function SessionTimer() {
         throw new Error('세션 연장 실패');
       }
 
+      const data = (await response.json()) as {
+        accessTokenExpiresAt?: string;
+      };
+
+      setExpiresAtTime(parseExpiresAt(data.accessTokenExpiresAt ?? null));
+      setNow(Date.now());
       router.refresh();
     } catch {
       router.push('/login');
@@ -78,7 +106,11 @@ export function SessionTimer() {
     <div className="flex items-center gap-3 text-xs text-slate-300">
       <span>
         남은 시간{' '}
-        <strong className="font-semibold text-white">
+        <strong
+          className="font-semibold text-white"
+          id="session-timer-value"
+          suppressHydrationWarning
+        >
           {formatRemainingTime(remainingMilliseconds)}
         </strong>
       </span>
@@ -86,6 +118,7 @@ export function SessionTimer() {
       <button
         className="rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 font-semibold text-violet-200 transition hover:bg-violet-400/20 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isRefreshing}
+        id="session-refresh-button"
         type="button"
         onClick={handleRefreshSession}
       >
