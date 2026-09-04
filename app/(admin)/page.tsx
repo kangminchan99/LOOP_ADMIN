@@ -1,4 +1,6 @@
+import { RebuildDailyStatsButton } from '@/src/features/admin/components/rebuild-daily-stats-button';
 import { getAdminDashboard } from '@/src/features/dashboard/api/get-admin-dashboard';
+import { DashboardGrowthChart } from '@/src/features/dashboard/components/dashboard-growth-chart';
 import { adminHomeStats } from '@/src/features/dashboard/data/admin-home-stats';
 
 /**
@@ -42,6 +44,8 @@ export default async function AdminHomePage() {
         },
       ]
     : adminHomeStats;
+  const dailyGrowth = dashboard.data?.dailyGrowth ?? [];
+
   return (
     <main>
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:px-8">
@@ -60,8 +64,12 @@ export default async function AdminHomePage() {
               </p>
             </div>
 
-            <div className="rounded-full border border-violet-400/30 bg-violet-400/10 px-4 py-2 text-sm text-violet-200">
-              MVP 1단계 · 정적 대시보드
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <RebuildDailyStatsButton />
+
+              <div className="rounded-full border border-violet-400/30 bg-violet-400/10 px-4 py-2 text-sm text-violet-200">
+                운영 대시보드
+              </div>
             </div>
           </div>
         </header>
@@ -96,7 +104,7 @@ export default async function AdminHomePage() {
             </article>
           ))}
         </section>
-
+        <DashboardGrowthChart data={dailyGrowth} />
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <article className="rounded-2xl border border-white/10 bg-white/4 p-6">
             <h2 className="text-lg font-semibold">다음 구현 순서</h2>

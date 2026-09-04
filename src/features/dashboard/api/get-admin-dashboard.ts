@@ -1,5 +1,12 @@
 import { ApiError, serverFetch } from '@/src/shared/api/server-fetch';
 
+type AdminDashboardDailyGrowth = {
+  date: string;
+  newUsers: number;
+  newPosts: number;
+  newComments: number;
+};
+
 export type AdminDashboardResponse = {
   totalUsers: number;
   totalPosts: number;
@@ -9,6 +16,7 @@ export type AdminDashboardResponse = {
   todayUsers: number;
   todayPosts: number;
   todayComments: number;
+  dailyGrowth: AdminDashboardDailyGrowth[];
   generatedAt: string;
 };
 
