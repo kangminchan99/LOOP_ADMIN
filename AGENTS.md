@@ -54,7 +54,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 개발 서버: `npm run dev -- -p 3001`
 - 린트: `npm run lint`
 - 타입/프로덕션 빌드 검사: `npm run build`
-- 단위 테스트: 아직 없음
+- 유저 삭제 단위 테스트: `npm run test:user-delete`
 - 통합/E2E 테스트: 아직 없음
 - 전체 검증: `npm run lint && npm run build`
 

@@ -1,5 +1,7 @@
 import { getAdminUsers } from '@/src/features/users/api/get-admin-users';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { DeleteUserButton } from '@/src/features/users/components/delete-user-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +13,7 @@ type AdminUsersPageProps = {
     page?: string;
     limit?: string;
     search?: string;
+    deleted?: string;
   }>;
 };
 
@@ -30,6 +33,12 @@ export default async function AdminUsersPage({
   });
 
   const users = userPage.items;
+  // 마지막 항목을 삭제한 뒤 빈 페이지에 머무르지 않도록 보정.
+  const lastPage = Math.max(1, userPage.totalPages);
+  if (page > lastPage) {
+    const href = buildUsersHref({ page: lastPage, limit: userPage.limit, search });
+    redirect(params.deleted === '1' ? `${href}&deleted=1` : href);
+  }
 
   const paginationPages = getPaginationPages(
     userPage.page,
@@ -50,6 +59,9 @@ export default async function AdminUsersPage({
             가입한 사용자 목록, 권한, 포인트를 확인합니다.
           </p>
         </header>
+        {params.deleted === '1' ? (
+          <p role="status" className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">유저 삭제가 완료되었습니다.</p>
+        ) : null}
         <form
           action="/users"
           className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/4 p-4 md:flex-row md:items-center"
@@ -99,6 +111,7 @@ export default async function AdminUsersPage({
                   <th className="px-5 py-3">권한</th>
                   <th className="px-5 py-3">포인트</th>
                   <th className="px-5 py-3">가입일</th>
+                  <th className="px-5 py-3">관리</th>
                 </tr>
               </thead>
 
@@ -122,13 +135,16 @@ export default async function AdminUsersPage({
                       <td className="px-5 py-4 text-slate-400">
                         {new Date(user.createdAt).toLocaleDateString('ko-KR')}
                       </td>
+                      <td className="px-5 py-4">
+                        <DeleteUserButton userId={user.id} nickname={user.nickname} />
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
                       className="px-5 py-10 text-center text-slate-400"
-                      colSpan={6}
+                      colSpan={7}
                     >
                       조회된 유저가 없습니다.
                     </td>
