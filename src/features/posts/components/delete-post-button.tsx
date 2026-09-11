@@ -70,11 +70,12 @@ export function DeletePostButton({ postId, title }: Props) {
         <h2 id={titleId} className="text-lg font-semibold">
           게시글을 삭제하시겠습니까?
         </h2>
-        <p className="mt-3 break-words text-sm text-slate-200">
+        <p className="mt-3 wrap-break-word text-sm text-slate-200">
           {title} · ID {postId}
         </p>
         <p className="mt-3 text-sm leading-6 text-slate-400">
-          삭제 후 복구할 수 없습니다. 해당 게시글에 작성된 댓글도 함께 삭제됩니다.
+          삭제 후 복구할 수 없습니다. 해당 게시글에 작성된 댓글도 함께
+          삭제됩니다.
         </p>
         <label htmlFor={inputId} className="mt-5 block text-sm text-slate-300">
           확인을 위해 게시글 ID {postId}을 입력해주세요.
