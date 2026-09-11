@@ -47,6 +47,17 @@
 
 ## 보안 검증
 
+### 게시글 삭제
+
+- 브라우저는 `DELETE /api/admin/posts/:id`를 호출한다. Route Handler는 Origin·양의 안전한 정수 ID·accessToken 쿠키를 검사한 뒤 NestJS `DELETE /admin/posts/:id`로 전달한다.
+- 최종 권한은 NestJS의 `JwtAuthGuard + AdminGuard`가 검사한다. 기존 앱의 작성자 전용 `DELETE /posts/:id` 권한은 변경하지 않는다.
+- HttpOnly 토큰을 브라우저 JavaScript에 노출하지 않는다. 성공은 본문 없는 204이며 서버 내부 오류 본문은 전달하지 않는다.
+- 확인창에서 게시글 ID를 입력해야 삭제할 수 있다. 요청 중 중복 클릭을 차단하고 자동 재시도하지 않는다.
+- 물리 삭제이며 댓글의 게시글 FK는 CASCADE로 선언되어 있다. 운영 DB 제약은 별도 확인한다. S3 파일·발송된 알림·과거 통계의 일괄 정리는 이번 범위가 아니다.
+- DB 삭제와 Redis 캐시 무효화는 원자적이지 않다. 통신 오류나 캐시 오류가 나도 이미 삭제됐을 수 있어 목록을 다시 확인한다.
+- `deleted=1`은 완료 안내용 URL 값이지 삭제 성공이나 권한의 증거가 아니다.
+- 삭제 감사 로그와 복구 정책은 후속 과제다. 실제 운영 데이터로 테스트하지 않는다.
+
 ### 유저 삭제
 
 - 브라우저는 같은 출처의 `DELETE /api/admin/users/:id`를 호출한다.

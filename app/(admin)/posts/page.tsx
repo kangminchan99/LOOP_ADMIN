@@ -1,6 +1,7 @@
 import { getAdminPosts } from '@/src/features/posts/api/get-admin-posts';
 import { AdminPostsTable } from '@/src/features/posts/components/admin-posts-table';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ type AdminPostsPageProps = {
     page?: string;
     limit?: string;
     search?: string;
+    deleted?: string;
   }>;
 };
 
@@ -29,6 +31,19 @@ export default async function AdminPostsPage({
     limit,
     search,
   });
+
+  // 삭제 후 현재 페이지가 사라졌으면 마지막 유효 페이지로 이동
+  const lastPage = Math.max(1, postsPage.totalPages);
+
+  if (page > lastPage) {
+    const href = buildPostsHref({
+      page: lastPage,
+      limit: postsPage.limit,
+      search,
+    });
+
+    redirect(params.deleted === '1' ? `${href}&deleted=1` : href);
+  }
 
   const paginationPages = getPaginationPages(
     postsPage.page,
@@ -52,7 +67,14 @@ export default async function AdminPostsPage({
             앱에 작성된 게시글을 조회하고 검색합니다.
           </p>
         </header>
-
+        {params.deleted === '1' ? (
+          <p
+            role="status"
+            className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200"
+          >
+            게시글 삭제가 완료되었습니다.
+          </p>
+        ) : null}
         <form
           action="/posts"
           className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/4 p-4 md:flex-row md:items-center"

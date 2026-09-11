@@ -1,4 +1,5 @@
 import type { AdminPostListItem } from '../types/admin-post';
+import { DeletePostButton } from './delete-post-button';
 
 type AdminPostsTableProps = {
   posts: AdminPostListItem[];
@@ -49,6 +50,7 @@ export function AdminPostsTable({ posts }: AdminPostsTableProps) {
               <th className="px-4 py-3">요약</th>
               <th className="px-4 py-3">생성일</th>
               <th className="px-4 py-3">수정일</th>
+              <th className="px-4 py-3">관리</th>
             </tr>
           </thead>
 
@@ -87,6 +89,12 @@ export function AdminPostsTable({ posts }: AdminPostsTableProps) {
 
                 <td className="px-4 py-4 text-slate-400">
                   {formatDate(post.updatedAt)}
+                </td>
+                <td className="px-4 py-4">
+                  <DeletePostButton
+                    postId={post.id}
+                    title={post.title}
+                  ></DeletePostButton>
                 </td>
               </tr>
             ))}
