@@ -1,4 +1,5 @@
 import type { AdminCommentListItem } from '../types/admin-comment';
+import { DeleteCommentButton } from './delete-comment-button';
 
 type AdminCommentsTableProps = {
   comments: AdminCommentListItem[];
@@ -32,6 +33,7 @@ export function AdminCommentsTable({ comments }: AdminCommentsTableProps) {
               <th className="px-4 py-3">게시글</th>
               <th className="px-4 py-3">작성일</th>
               <th className="px-4 py-3">수정일</th>
+              <th className="px-4 py-3">관리</th>
             </tr>
           </thead>
 
@@ -41,7 +43,7 @@ export function AdminCommentsTable({ comments }: AdminCommentsTableProps) {
                 <td className="px-4 py-4 text-slate-400">{comment.id}</td>
 
                 <td className="px-4 py-4">
-                  <p className="max-w-[360px] line-clamp-2 text-slate-100">
+                  <p className="max-w-90 line-clamp-2 text-slate-100">
                     {comment.content}
                   </p>
                 </td>
@@ -56,7 +58,7 @@ export function AdminCommentsTable({ comments }: AdminCommentsTableProps) {
                 </td>
 
                 <td className="px-4 py-4">
-                  <p className="max-w-[280px] truncate text-slate-100">
+                  <p className="max-w-70 truncate text-slate-100">
                     {comment.postTitle ?? '삭제된 게시글'}
                   </p>
                   <p className="text-xs text-slate-500">ID {comment.postId}</p>
@@ -68,6 +70,12 @@ export function AdminCommentsTable({ comments }: AdminCommentsTableProps) {
 
                 <td className="px-4 py-4 text-slate-400">
                   {formatDate(comment.updatedAt)}
+                </td>
+                <td className="px-4 py-4">
+                  <DeleteCommentButton
+                    commentId={comment.id}
+                    content={comment.content}
+                  />
                 </td>
               </tr>
             ))}

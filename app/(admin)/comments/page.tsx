@@ -1,6 +1,7 @@
 import { getAdminComments } from '@/src/features/comments/api/get-admin-comments';
 import { AdminCommentsTable } from '@/src/features/comments/components/admin-comments-table';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ type AdminCommentsPageProps = {
     page?: string;
     limit?: string;
     search?: string;
+    deleted?: string;
   }>;
 };
 
@@ -29,6 +31,19 @@ export default async function AdminCommentsPage({
     limit,
     search,
   });
+
+  // 현재 페이지가 사라졌으면 마지막 유효 페이지로 이동
+  const lastPage = Math.max(1, commentsPage.totalPages);
+
+  if (page > lastPage) {
+    const href = buildCommentsHref({
+      page: lastPage,
+      limit: commentsPage.limit,
+      search,
+    });
+
+    redirect(params.deleted === '1' ? `${href}&deleted=1` : href);
+  }
 
   const paginationPages = getPaginationPages(
     commentsPage.page,
@@ -50,7 +65,14 @@ export default async function AdminCommentsPage({
             앱에 작성된 댓글과 연결된 게시글 정보를 확인합니다.
           </p>
         </header>
-
+        {params.deleted === '1' ? (
+          <p
+            role="status"
+            className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200"
+          >
+            댓글 삭제가 완료되었습니다.
+          </p>
+        ) : null}
         <form
           action="/comments"
           className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/4 p-4 md:flex-row md:items-center"
