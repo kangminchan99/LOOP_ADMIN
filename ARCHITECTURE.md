@@ -117,8 +117,12 @@ Client Component로 분리:
 
 ## 알려진 제약과 기술 부채
 
+### 댓글 삭제 추가 계획
+
+[단계별 가이드](docs/ADMIN_COMMENT_DELETE.md)에 따라 브라우저 API 함수 → Next.js Route Handler → NestJS 관리자 API로 연결할 예정이다. 최종 권한은 NestJS가 검사하고, 페이지·테이블은 서버 렌더링을 유지하며 확인창만 클라이언트로 분리한다. 현재는 계획이며 구현 완료를 의미하지 않는다.
+
+
 - 현재 관리자 홈은 mock 데이터를 사용한다.
 - 아직 관리자 로그인/토큰 저장 방식이 확정되지 않았다.
 - 최종적으로는 HttpOnly Cookie 기반 BFF 구조를 검토한다.
 - 아직 E2E 테스트 도구가 없다.
-

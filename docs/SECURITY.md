@@ -47,6 +47,11 @@
 
 ## 보안 검증
 
+### 댓글 삭제 — 구현 예정 기준
+
+[댓글 삭제 계획](ADMIN_COMMENT_DELETE.md)을 따른다. Origin·ID·인증 쿠키를 BFF에서 검사하고 관리자 권한은 NestJS에서 최종 검증한다. 기존 앱의 작성자 전용 API는 변경하지 않는다. 물리 삭제 전 댓글 ID를 확인하며 자동 재시도하지 않는다. 부모 게시글·작성자는 삭제 대상이 아니다. 이 항목은 아직 구현·검증 완료 기록이 아니다.
+
+
 ### 게시글 삭제
 
 - 브라우저는 `DELETE /api/admin/posts/:id`를 호출한다. Route Handler는 Origin·양의 안전한 정수 ID·accessToken 쿠키를 검사한 뒤 NestJS `DELETE /admin/posts/:id`로 전달한다.

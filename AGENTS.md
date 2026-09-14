@@ -23,6 +23,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
    - 테스트나 검증 변경: `docs/TESTING.md`
    - 데이터, 권한, 인증, 외부 연동: `docs/SECURITY.md`
    - 관리자 UI, 레이아웃, 반응형 변경: `docs/RESPONSIVE_LAYOUT.md`
+   - 관리자 댓글 삭제 구현: `docs/ADMIN_COMMENT_DELETE.md` (단계별 구현 계획)
    - 기존 기술 결정과 충돌할 가능성: `docs/decisions/`
 5. 변경 대상 코드와 가장 가까운 기존 구현 및 테스트를 조사합니다.
 
