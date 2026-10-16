@@ -22,6 +22,7 @@ export function AdminShell({
     { href: '/users', label: '유저 관리' },
     { href: '/posts', label: '게시글 관리' },
     { href: '/comments', label: '댓글 관리' },
+    { href: '/coupons', label: '쿠폰 이벤트 생성' },
   ];
 
   function getNavItemClass(href: string) {
